@@ -24,6 +24,7 @@ def clear_output(output_widget):
 # Separate child function for multiprocessing
 def child(pipe):
     """Child process sends data through pipe."""
+    pid = os.getpid()
     pipe.send("Hello from child process through pipe")
     pipe.close()
 
@@ -50,7 +51,7 @@ def monitor_shared_memory(output_widget):
     # Assign data to shared memory using memoryview
     memoryview(shm.buf)[:len(data)] = data
 
-    message = f"[SHM] Written: {bytes(shm.buf[:len(data)]).decode()}\n"
+    message = f"[SHM] Written: {bytes(shm.buf[:len(data)]).decode()} (PID: {os.getpid()})\n"
     update_output(output_widget, message)
 
     # Clean up
@@ -64,16 +65,17 @@ def monitor_semaphore(output_widget):
     sem = Semaphore(1)
 
     sem.acquire()
-    update_output(output_widget, "[SEMAPHORE] Locked\n")
+    update_output(output_widget, f"[SEMAPHORE] Locked (PID: {os.getpid()})\n")
 
     time.sleep(1)
     sem.release()
-    update_output(output_widget, "[SEMAPHORE] Unlocked\n")
+    update_output(output_widget, f"[SEMAPHORE] Unlocked (PID: {os.getpid()})\n")
 
 
 # Socket server process (without GUI references)
 def socket_server(queue, host, port):
     """Socket server process that sends messages to the queue."""
+    pid = os.getpid()
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
         server.bind((host, port))
         server.listen()
@@ -81,16 +83,17 @@ def socket_server(queue, host, port):
         conn, addr = server.accept()
         with conn:
             data = conn.recv(1024)
-            queue.put(f"[SOCKET] Received: {data.decode()}\n")
+            queue.put(f"[SOCKET] Received: {data.decode()} (PID: {pid})\n")
 
 
 # Socket client process
 def socket_client(host, port):
     """Socket client sends a message."""
+    pid = os.getpid()
     time.sleep(1)
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
         client.connect((host, port))
-        client.sendall(b"Hello from socket client!")
+        client.sendall(f"Hello from socket client! (PID: {pid})".encode())
 
 
 # Monitor sockets with queue
@@ -127,7 +130,7 @@ def stop_debugger(output_widget):
 def run_debugger(output_widget):
     """Runs the entire IPC debugger."""
     output_widget.delete(1.0, tk.END)
-    update_output(output_widget, "\n---- IPC Debugger ----\n")
+    update_output(output_widget, f"\n---- IPC Debugger (PID: {os.getpid()}) ----\n")
     monitor_pipes(output_widget)
     monitor_shared_memory(output_widget)
     monitor_semaphore(output_widget)
