@@ -9,6 +9,18 @@ from multiprocessing import Process, Queue, Pipe, Semaphore, shared_memory
 # Global list to track running processes
 processes = []
 
+# Update output window
+def update_output(output_widget, message):
+    """Updates the GUI output area with timestamps."""
+    timestamp = datetime.now().strftime("[%H:%M:%S] ")
+    output_widget.insert("1.0", timestamp + message)
+    output_widget.see("1.0")
+
+# Clear output window
+def clear_output(output_widget):
+    """Clears the output log."""
+    output_widget.delete(1.0, tk.END)
+
 # Separate child function for multiprocessing
 def child(pipe):
     """Child process sends data through pipe."""
@@ -103,17 +115,6 @@ def monitor_sockets(output_widget):
         message = queue.get()
         update_output(output_widget, message)
 
-
-# Update output window
-def update_output(output_widget, message):
-    """Updates the GUI output area."""
-    output_widget.insert(tk.END, message)
-    output_widget.see(tk.END)
-
-def clear_output(output_widget):
-     """Clears the output log."""
-     output_widget.delete(1.0, tk.END)
-
 # Stop running processes
 def stop_debugger(output_widget):
     """Stops all running IPC processes."""
@@ -134,7 +135,6 @@ def run_debugger(output_widget):
 
     update_output(output_widget, "\nIPC Monitoring Completed!\n")
 
-
 # GUI Setup
 def setup_gui():
     """Creates the GUI window."""
@@ -142,33 +142,25 @@ def setup_gui():
     app.title("IPC Debugger (Windows Compatible)")
     app.geometry("800x500")
 
-     # Output log area
+    # Output log at the top
     output_text = scrolledtext.ScrolledText(app, wrap=tk.WORD, width=100, height=20, font=("Courier", 10))
-    output_text.pack(pady=10)
- 
-    clear_btn = tk.Button(app, text="Clear Log", command=lambda: clear_output(output_text), bg="red", fg="white",
-                           font=("Helvetica", 12))
-    clear_btn.pack(pady=5)
- 
-     # "Run Debugger" button
-    btn = tk.Button(app, text="Run Debugger", command=lambda: run_debugger(output_text), bg="green", fg="white",
-                     font=("Helvetica", 12))
-    btn.pack(pady=5)
+    output_text.pack(pady=(10, 5), fill=tk.BOTH, expand=True)
 
-    stop_btn = tk.Button(app, text="Stop Debugger", command=lambda: stop_debugger(output_text), bg="orange", fg="white", font=("Helvetica", 12))
-    stop_btn.pack(pady=5)
+    # Button frame at the bottom
+    button_frame = tk.Frame(app)
+    button_frame.pack(pady=10)
 
+    run_btn = tk.Button(button_frame, text="Run Debugger", command=lambda: run_debugger(output_text), bg="green", fg="white", font=("Helvetica", 12))
+    run_btn.pack(side=tk.LEFT, padx=5)
 
-    tk.Label(app, text="Inter-Process Communication (IPC) Debugger", font=("Helvetica", 16, "bold")).pack(pady=10)
+    stop_btn = tk.Button(button_frame, text="Stop Debugger", command=lambda: stop_debugger(output_text), bg="orange", fg="white", font=("Helvetica", 12))
+    stop_btn.pack(side=tk.LEFT, padx=5)
 
-    output_text = scrolledtext.ScrolledText(app, wrap=tk.WORD, width=100, height=20, font=("Courier", 10))
-    output_text.pack(pady=10)
-
-    btn = tk.Button(app, text="Run Debugger", command=lambda: run_debugger(output_text), bg="green", fg="white",
-                    font=("Helvetica", 12))
-    btn.pack(pady=5)
+    clear_btn = tk.Button(button_frame, text="Clear Log", command=lambda: clear_output(output_text), bg="red", fg="white", font=("Helvetica", 12))
+    clear_btn.pack(side=tk.LEFT, padx=5)
 
     app.mainloop()
+
 
 from datetime import datetime
 def update_output(output_widget, message):
