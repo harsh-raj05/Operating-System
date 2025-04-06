@@ -156,41 +156,48 @@ def run_debugger(output_widget):
 def setup_gui():
     """Creates the GUI window."""
     app = tk.Tk()
-    app.title("IPC Debugger (Windows Compatible)")
-    app.geometry("800x500")
+    app.title("🛠️ IPC Debugger (Windows Compatible)")
+    app.geometry("900x600")
+    app.configure(bg="#f0f0f0")
 
-    # Output log at the top
-    output_text = scrolledtext.ScrolledText(app, wrap=tk.WORD, width=100, height=20, font=("Courier", 10))
-    output_text.pack(pady=(10, 5), fill=tk.BOTH, expand=True)
+    # Output log area
+    output_text = scrolledtext.ScrolledText(app, wrap=tk.WORD, width=100, height=25, font=("Consolas", 11))
+    output_text.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
-    # Button frame at the bottom
-    button_frame = tk.Frame(app)
-    button_frame.pack(pady=10)
+    # Control Buttons (Top Row)
+    control_frame = tk.Frame(app, bg="#f0f0f0")
+    control_frame.pack(pady=(0, 10))
 
-    run_btn = tk.Button(button_frame, text="Run All", command=lambda: run_debugger(output_text), bg="green", fg="white", font=("Helvetica", 12))
-    run_btn.pack(side=tk.LEFT, padx=5)
+    run_btn = tk.Button(control_frame, text="▶ Run Debugger", command=lambda: run_debugger(output_text),
+                        bg="#4CAF50", fg="white", font=("Helvetica", 12, "bold"), width=15)
+    run_btn.pack(side=tk.LEFT, padx=10)
 
-    # Individual IPC buttons
-    pipe_btn = tk.Button(button_frame, text="Pipes", command=lambda: monitor_pipes(output_text), bg="lightblue", font=("Helvetica", 12))
-    pipe_btn.pack(side=tk.LEFT, padx=5)
+    stop_btn = tk.Button(control_frame, text="⛔ Stop Debugger", command=lambda: stop_debugger(output_text),
+                         bg="#FF9800", fg="white", font=("Helvetica", 12, "bold"), width=15)
+    stop_btn.pack(side=tk.LEFT, padx=10)
 
-    shm_btn = tk.Button(button_frame, text="Shared Memory", command=lambda: monitor_shared_memory(output_text), bg="lightgreen", font=("Helvetica", 12))
-    shm_btn.pack(side=tk.LEFT, padx=5)
+    clear_btn = tk.Button(control_frame, text="🧹 Clear Log", command=lambda: clear_output(output_text),
+                          bg="#F44336", fg="white", font=("Helvetica", 12, "bold"), width=15)
+    clear_btn.pack(side=tk.LEFT, padx=10)
 
-    sem_btn = tk.Button(button_frame, text="Semaphore", command=lambda: monitor_semaphore(output_text), bg="khaki", font=("Helvetica", 12))
-    sem_btn.pack(side=tk.LEFT, padx=5)
+    # IPC Buttons (Bottom Row)
+    ipc_frame = tk.LabelFrame(app, text="Test Individual IPC Methods", bg="#f0f0f0", font=("Helvetica", 12, "bold"))
+    ipc_frame.pack(padx=10, pady=(0, 20))
 
-    socket_btn = tk.Button(button_frame, text="Sockets", command=lambda: monitor_sockets(output_text), bg="plum", font=("Helvetica", 12))
-    socket_btn.pack(side=tk.LEFT, padx=5)
+    tk.Button(ipc_frame, text="🧵 Pipes", command=lambda: monitor_pipes(output_text),
+              bg="#2196F3", fg="white", font=("Helvetica", 11), width=18).pack(side=tk.LEFT, padx=10, pady=10)
 
-    stop_btn = tk.Button(button_frame, text="Stop Debugger", command=lambda: stop_debugger(output_text), bg="orange", fg="white", font=("Helvetica", 12))
-    stop_btn.pack(side=tk.LEFT, padx=5)
+    tk.Button(ipc_frame, text="💾 Shared Memory", command=lambda: monitor_shared_memory(output_text),
+              bg="#9C27B0", fg="white", font=("Helvetica", 11), width=18).pack(side=tk.LEFT, padx=10, pady=10)
 
-    clear_btn = tk.Button(button_frame, text="Clear Log", command=lambda: clear_output(output_text), bg="red", fg="white", font=("Helvetica", 12))
-    clear_btn.pack(side=tk.LEFT, padx=5)
+    tk.Button(ipc_frame, text="🔐 Semaphore", command=lambda: monitor_semaphore(output_text),
+              bg="#3F51B5", fg="white", font=("Helvetica", 11), width=18).pack(side=tk.LEFT, padx=10, pady=10)
 
+    tk.Button(ipc_frame, text="🌐 Sockets", command=lambda: monitor_sockets(output_text),
+              bg="#795548", fg="white", font=("Helvetica", 11), width=18).pack(side=tk.LEFT, padx=10, pady=10)
 
     app.mainloop()
+
 
 
 from datetime import datetime
