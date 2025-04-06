@@ -52,18 +52,28 @@ def monitor_shared_memory(output_widget):
     shm.close()
     shm.unlink()
 
-
-# Monitor Semaphores
 def monitor_semaphore(output_widget):
-    """Monitors IPC using semaphores."""
+    """Demonstrates Semaphore usage with multiple processes."""
     sem = Semaphore(1)
+    queue = Queue()
 
-    sem.acquire()
-    update_output(output_widget, f"[SEMAPHORE] Locked (PID: {os.getpid()})\n")
+    # Create child processes
+    p1 = Process(target=semaphore_child, args=(sem, queue, "Process A"))
+    p2 = Process(target=semaphore_child, args=(sem, queue, "Process B"))
 
-    time.sleep(1)
-    sem.release()
-    update_output(output_widget, f"[SEMAPHORE] Unlocked (PID: {os.getpid()})\n")
+    processes.extend([p1, p2])
+
+    # Start and join processes
+    p1.start()
+    p2.start()
+
+    p1.join()
+    p2.join()
+
+    # Display output from queue
+    while not queue.empty():
+        message = queue.get()
+        update_output(output_widget, f"[SEMAPHORE] {message}")
 
 
 # Socket server process (without GUI references)
@@ -78,7 +88,15 @@ def socket_server(queue, host, port):
         with conn:
             data = conn.recv(1024)
             queue.put(f"[SOCKET] Received: {data.decode()} (PID: {pid})\n")
-            
+
+# Semaphore child function
+def semaphore_child(sem, queue, name):
+    sem.acquire()
+    queue.put(f"{name} acquired lock (PID: {os.getpid()})\n")
+    time.sleep(2)
+    queue.put(f"{name} releasing lock (PID: {os.getpid()})\n")
+    sem.release()
+
 # Socket client process
 def socket_client(host, port):
     """Socket client sends a message."""
