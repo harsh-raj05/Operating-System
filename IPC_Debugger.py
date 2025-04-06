@@ -78,8 +78,7 @@ def socket_server(queue, host, port):
         with conn:
             data = conn.recv(1024)
             queue.put(f"[SOCKET] Received: {data.decode()} (PID: {pid})\n")
-
-
+            
 # Socket client process
 def socket_client(host, port):
     """Socket client sends a message."""
@@ -150,14 +149,28 @@ def setup_gui():
     button_frame = tk.Frame(app)
     button_frame.pack(pady=10)
 
-    run_btn = tk.Button(button_frame, text="Run Debugger", command=lambda: run_debugger(output_text), bg="green", fg="white", font=("Helvetica", 12))
+    run_btn = tk.Button(button_frame, text="Run All", command=lambda: run_debugger(output_text), bg="green", fg="white", font=("Helvetica", 12))
     run_btn.pack(side=tk.LEFT, padx=5)
+
+    # Individual IPC buttons
+    pipe_btn = tk.Button(button_frame, text="Pipes", command=lambda: monitor_pipes(output_text), bg="lightblue", font=("Helvetica", 12))
+    pipe_btn.pack(side=tk.LEFT, padx=5)
+
+    shm_btn = tk.Button(button_frame, text="Shared Memory", command=lambda: monitor_shared_memory(output_text), bg="lightgreen", font=("Helvetica", 12))
+    shm_btn.pack(side=tk.LEFT, padx=5)
+
+    sem_btn = tk.Button(button_frame, text="Semaphore", command=lambda: monitor_semaphore(output_text), bg="khaki", font=("Helvetica", 12))
+    sem_btn.pack(side=tk.LEFT, padx=5)
+
+    socket_btn = tk.Button(button_frame, text="Sockets", command=lambda: monitor_sockets(output_text), bg="plum", font=("Helvetica", 12))
+    socket_btn.pack(side=tk.LEFT, padx=5)
 
     stop_btn = tk.Button(button_frame, text="Stop Debugger", command=lambda: stop_debugger(output_text), bg="orange", fg="white", font=("Helvetica", 12))
     stop_btn.pack(side=tk.LEFT, padx=5)
 
     clear_btn = tk.Button(button_frame, text="Clear Log", command=lambda: clear_output(output_text), bg="red", fg="white", font=("Helvetica", 12))
     clear_btn.pack(side=tk.LEFT, padx=5)
+
 
     app.mainloop()
 
