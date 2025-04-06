@@ -9,13 +9,6 @@ from multiprocessing import Process, Queue, Pipe, Semaphore, shared_memory
 # Global list to track running processes
 processes = []
 
-# Update output window
-def update_output(output_widget, message):
-    """Updates the GUI output area with timestamps."""
-    timestamp = datetime.now().strftime("[%H:%M:%S] ")
-    output_widget.insert("1.0", timestamp + message)
-    output_widget.see("1.0")
-
 # Clear output window
 def clear_output(output_widget):
     """Clears the output log."""
@@ -35,6 +28,7 @@ def monitor_pipes(output_widget):
     parent_conn, child_conn = Pipe()
 
     proc = Process(target=child, args=(child_conn,))
+    processes.append(proc)
     proc.start()
     proc.join()
 
@@ -106,6 +100,9 @@ def monitor_sockets(output_widget):
 
     server_process = Process(target=socket_server, args=(queue, host, port))
     client_process = Process(target=socket_client, args=(host, port))
+
+    processes.append(server_process)  
+    processes.append(client_process)
 
     server_process.start()
     client_process.start()
