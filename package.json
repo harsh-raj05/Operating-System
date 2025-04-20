@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@types/node": "^22.14.1",
+    "react-force-graph": "^1.47.6",
+    "react-force-graph-2d": "^1.27.1",
+    "recharts": "^2.15.3"
+  }
+}
